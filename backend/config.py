@@ -23,9 +23,9 @@ class Settings:
         default_factory=lambda: os.getenv("ANTHROPIC_API_KEY") or None
     )
     ANTHROPIC_MODEL: str = field(
-        default_factory=lambda: os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
+        default_factory=lambda: os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5")
     )
-    LLM_MAX_TOKENS: int = field(default_factory=lambda: int(os.getenv("LLM_MAX_TOKENS", "800")))
+    LLM_MAX_TOKENS: int = field(default_factory=lambda: int(os.getenv("LLM_MAX_TOKENS", "1500")))
     LLM_TIMEOUT_SECONDS: float = field(
         default_factory=lambda: float(os.getenv("LLM_TIMEOUT_SECONDS", "20"))
     )
