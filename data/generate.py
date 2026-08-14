@@ -87,11 +87,14 @@ def _clean_traffic(rng: random.Random, n: int) -> list[dict]:
     out: list[dict] = []
     for k in range(n):
         c = rng.choice(customers)
-        # Daytime-weighted: pick an hour in 8..21 so off-hours stays a real signal.
         day = rng.randint(0, 13)
+        # Mostly daytime, but a few percent genuinely land in the small hours.
+        # Real portfolios look like this, and it keeps the off_hours rule honest:
+        # those rows fire a weak signal and must still not be flagged on it alone.
+        hour = rng.randint(1, 4) if rng.random() < 0.04 else rng.randint(8, 21)
         when = BASE + timedelta(
             days=day,
-            hours=rng.randint(8, 21) - 9,
+            hours=hour - 9,
             minutes=rng.randint(0, 59),
             seconds=rng.randint(0, 59),
         )
