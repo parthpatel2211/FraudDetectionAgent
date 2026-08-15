@@ -224,7 +224,7 @@ cp .env.example .env
 Frontend, in a second terminal:
 
 ```bash
-npm install --prefix frontend && npm run dev --prefix frontend
+cd frontend && npm install && npm run dev
 ```
 
 Open http://localhost:5173. The Vite dev server proxies `/api` to Flask, so there is no CORS
@@ -240,7 +240,7 @@ Tests:
 ```
 
 ```bash
-npm test --prefix frontend
+cd frontend && npm test
 ```
 
 ```bash
