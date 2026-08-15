@@ -1,315 +1,238 @@
 # Fraud Investigation Platform
 
-Detects coordinated fraud rings in transaction data, groups them into cases, and explains
-every score it produces.
+Finds coordinated fraud rings in transaction data, groups them into cases, and shows the evidence behind every score.
+
+### [Try it here](https://parthpatel2211.github.io/FraudDetectionAgent/)
 
 [![CI](https://github.com/parthpatel2211/FraudDetectionAgent/actions/workflows/ci.yml/badge.svg)](https://github.com/parthpatel2211/FraudDetectionAgent/actions/workflows/ci.yml)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-<!-- Live demo: add the deployment URL here once deployed. -->
+Press "Load demo dataset" and you get four fraud cases with their evidence, their graphs, and their write-ups. The hosted demo runs on GitHub Pages, which serves files and nothing else, so the detection engine there ran at build time rather than when you clicked. Uploading your own data needs the API, which means running it locally or deploying the Vercel config.
 
----
-
-## Two ways to run it
-
-| | GitHub Pages | Vercel |
-|---|---|---|
-| Hosting | Static files only | Static SPA + Python function |
-| Detection engine | Runs at **build time**, results bundled | Runs **live** per request |
-| Explore the four demo cases | ✅ | ✅ |
-| Signals, evidence, graph, narratives | ✅ | ✅ |
-| Upload your own CSV/JSON | ❌ | ✅ |
-| Live Claude narratives | ❌ (bundled text) | ✅ |
-| Cost / cold start | Free, none | Free tier, ~1–2s |
-
-GitHub Pages has no Python runtime, so the engine cannot execute per request there.
-The Pages workflow runs the real engine during the build and bundles its output, and the
-UI says plainly that it is doing so — nothing is faked, but nothing is live either.
-`vercel.json` is the full-stack deployment.
-
----
-
-## The problem
-
-Most fraud scoring treats a transaction as an isolated event: score it, threshold it, alert
-on it. That catches the careless, and misses the organised.
-
-Coordinated fraud is visible in the *connections* between transactions, not in any single
-one of them. Three "customers" whose only shared trait is a device fingerprint. Eight £2
-charges that mean nothing alone and everything when followed by a £2,400 one. Six transfers
-of £9,400 that are individually unremarkable and collectively a structuring pattern. Score
-those rows one at a time and each looks survivable.
-
-The second problem is what an analyst does with a score. A model that says `0.94` and
-nothing else cannot be actioned: the analyst still has to reconstruct why, and if they
-can't, they either escalate everything or trust nothing.
-
-This project takes the position that a fraud score is only useful if it arrives with its
-evidence attached.
+<!-- screenshot: the workspace, dark theme, a case selected -->
 
 ## What it does
 
-- **Scores every transaction against ten explainable rules.** Each rule states its own case
-  in a sentence containing the numbers that triggered it.
-- **Groups flagged transactions into cases** using a transaction-similarity graph, so a ring
-  arrives as one investigation rather than nine unrelated alerts.
-- **Draws the ring.** The graph is rendered interactively — hover an edge to see which shared
-  attribute linked two transactions.
-- **Writes the case up** with Claude, using structured output, and falls back to a
-  deterministic template whenever the model is unavailable. The UI always says which one
-  produced the text.
-- **Exposes the same engine over MCP**, so Claude can investigate a dataset conversationally.
+Give it a batch of transactions and it scores each one against ten rules. The rules are ordinary code: shared devices, impossible travel between countries, small charges followed by a large one, amounts parked just below a reporting threshold. Each rule that fires writes a sentence explaining itself, with the numbers that set it off already in the sentence.
 
-## How detection works
+Transactions that clear the threshold then get grouped. Fraud rings show up in what transactions have in common rather than in any single row, so the ones sharing a device or an address end up in the same case instead of arriving as nine separate alerts nobody connects.
 
-### 1. Rules
+Each case can be written up by Claude into something an analyst can act on. That part needs an API key. Everything else does not.
 
-Every rule returns a score in `[0, 1]` and a `weight` — its maximum contribution to a
-transaction's risk.
+## Why it stopped using machine learning
+
+The first version used an Isolation Forest. Replacing it is the main engineering decision in this project, and the reasoning is worth setting out.
+
+The model was fitted on whatever batch arrived in the request, then a threshold was taken at the 98th percentile of the resulting scores. That flags the top two percent of any batch. Send it four perfectly ordinary transactions and it still reports fraud, because two percent of something is always something. There was no way for it to say a batch looked clean, which is the answer most batches deserve.
+
+The scores had the same shape of problem. A case scored its mean anomaly divided by the batch maximum, so the worst case in any batch came out near one by construction. The badge in the interface read "Critical" every single time. A number that means "worst thing here" is not a risk score, it is a ranking wearing a risk score's clothes.
+
+There was also a crash waiting. Features came from one-hot encoding the channel column, so the width of the feature vector depended on which channels happened to appear. A model fitted on card and web payments would raise on the first batch containing a transfer.
+
+Rules avoid all of this by being boring. Each has a fixed weight, the weights combine the same way every time, and a batch with nothing suspicious in it produces no cases. A score means the same thing on Tuesday as it did on Monday.
+
+What I did not expect was that it made the product better rather than only safer. A forest can tell you a transaction is unusual but not why, and "unusual" is not something an analyst can act on. A rule already knows why it fired, so the explanation comes free and lands in the interface next to the number.
+
+## How a score is built
+
+Every rule returns a strength between zero and one, and carries a weight that caps how much it can contribute.
 
 | Rule | Weight | Fires when |
-|------|--------|------------|
-| **Geographically impossible sequence** | 0.90 | Consecutive transactions by one customer in different countries less than four hours apart. Full score under one hour, decaying to zero at four. |
-| **Shared device across customers** | 0.85 | One device fingerprint used by two or more customers. Devices with more than 20 transactions are treated as shared terminals and skipped. |
-| **Card testing followed by cash-out** | 0.80 | Three or more transactions under 5 USD followed within 120 minutes by a charge of at least 500 USD. |
-| **Amounts just under a reporting threshold** | 0.75 | Three or more transactions between 8,500 and 10,000 USD by one customer within 24 hours. |
-| **Escalating amounts at one merchant** | 0.70 | Strictly increasing amounts at one merchant with gaps under 15 minutes, ending at least double where they started. |
-| **Abnormal transaction velocity** | 0.65 | More than 5 transactions by one customer inside any 10-minute sliding window. |
-| **Shared IP across customers** | 0.55 | One IP serving three or more customers. Looser than the device rule because households and NAT legitimately share addresses. Skipped above 50 transactions. |
-| **Amount far outside customer baseline** | 0.45 | More than three standard deviations above the customer's own baseline, computed leave-one-out. Needs four transactions of history. |
-| **Burst of first-time merchants** | 0.45 | Three or more never-before-seen merchants for one customer within 60 minutes. |
-| **Off-hours activity** | 0.25 | Transaction between 01:00 and 05:00 UTC. |
+|---|---|---|
+| Geographically impossible sequence | 0.90 | One customer transacting in two countries less than four hours apart |
+| Shared device across customers | 0.85 | One device fingerprint used by two or more customers |
+| Card testing followed by cash-out | 0.80 | Three or more charges under 5 USD, then one over 500 within two hours |
+| Amounts just under a reporting threshold | 0.75 | Three or more transfers between 8,500 and 10,000 USD in a day |
+| Escalating amounts at one merchant | 0.70 | Rising amounts under fifteen minutes apart, ending at double the start |
+| Abnormal transaction velocity | 0.65 | More than five transactions by one customer in ten minutes |
+| Shared IP across customers | 0.55 | One address serving three or more customers |
+| Amount far outside customer baseline | 0.45 | More than three standard deviations above that customer's own history |
+| Burst of first-time merchants | 0.45 | Three or more never-seen merchants within an hour |
+| Off-hours activity | 0.25 | Posted between 01:00 and 05:00 UTC |
 
-**The bottom two weights are below the 0.5 flag threshold on purpose.** A large purchase, or
-a 3am coffee, cannot open a case on its own — a detector that alerts on those is a
-false-positive machine. They raise the score of a case built on stronger evidence instead.
-On the demo dataset each touches 13 clean transactions and neither flags one.
+The bottom two sit below the flag threshold deliberately. A large purchase is a laptop. A three in the morning transaction is somebody who could not sleep. Either one opening a case by itself would bury an analyst in false positives, so both can only raise the score of a case that other evidence already built. On the demo dataset they touch thirteen clean transactions each and flag none of them.
 
-Two rules carry an explicit **hub cap**: a device or IP shared by hundreds of transactions is
-shared infrastructure, not a ring, and is skipped rather than scored.
-
-### 2. Combining evidence
-
-Scores combine with **noisy-OR**, treating each hit as independent evidence:
+Scores combine with noisy-OR, treating each rule as independent evidence:
 
 ```
-risk = 1 − ∏ (1 − weightᵢ × scoreᵢ)
+risk = 1 - product(1 - weight * strength)
 ```
 
-Worked example — the shared-device ring (`CASE-F4565612E2`), taken from the actual output:
+Taken from the actual output for the shared-device ring:
 
 ```
-shared_device_ring          → 0.8500
-rapid_escalation  (×3)      → 0.8483   three customers each escalating
-shared_ip_ring              → 0.1833
+shared device across customers        0.8500
+escalating amounts at one merchant    0.8483   (three customers, each escalating)
+shared IP across customers            0.1833
 
-risk = 1 − (0.1500 × 0.1517 × 0.8167) = 0.9814
+risk = 1 - (0.1500 * 0.1517 * 0.8167) = 0.9814
 ```
 
-A rule that fires several times in one case is folded into a single contribution, also by
-noisy-OR. Because the operation is associative, **the contributions shown in the UI
-recombine to exactly the score shown on the case** — an analyst can add up the evidence and
-land on the number. A test asserts this for every case.
+Because the operation is associative, a rule that fires several times folds into one contribution without changing the total. That is what lets the evidence list in the interface add up to the number printed on the case, and a test checks it for every case rather than trusting it stays true.
 
-The result is **absolute**: bounded in `[0, 1]`, monotone (more evidence never lowers a
-score), and independent of what else is in the batch. That last property is the point — a
-score of 0.85 means the same thing in a batch of 50 and a batch of 50,000, so the threshold
-is meaningful and the detector can return *nothing* when a batch is clean.
+The result is bounded, it never falls when evidence is added, and it does not depend on what else was in the batch. That last property is the one worth having: 0.85 means the same thing in a batch of fifty and a batch of fifty thousand, so a fixed threshold is meaningful and a clean batch can return nothing at all.
 
-### 3. Grouping into cases
+<!-- screenshot: the signals tab, showing contributions and evidence chips -->
 
-Flagged transactions are linked pairwise by the attributes they share:
+## Why the graph exists
 
-| Shared attribute | Contributes |
-|---|---|
-| `device_id` | 0.80 |
-| `customer_id` | 0.50 |
-| `account_id` | 0.50 |
-| `ip_address` | 0.50 |
-| `merchant_id` | **0.15** |
+Flagged transactions get linked to each other by what they share. A device counts for 0.80, a customer or account or address for 0.50, and a merchant for 0.15. A pair links when the total reaches 0.60.
 
-A pair is linked when the total reaches **0.60**, then connected components are split into
-communities by greedy modularity.
+That merchant weight is the interesting one. Merchant is the single attribute complete strangers routinely share, and weighting it like the others is exactly what the first version did. Because every transaction linked to its merchant node, one popular shop pulled every unrelated customer who had ever bought something there into a single enormous case. At 0.15 a shared merchant cannot link anything by itself. It can only reinforce a connection other evidence already made. Two tests pin this down: forty customers at one merchant produce zero edges.
 
-**Merchant is weighted at 0.15 for a specific reason.** It is the one attribute strangers
-routinely share. Weighted like the others, a single popular merchant merges every unrelated
-customer who shopped there into one enormous "case" — which is exactly what the earlier
-version of this project did. At 0.15 a shared merchant can never link a pair on its own; it
-only reinforces a link that other evidence already supports. Two tests pin this down: forty
-customers at one merchant produce **zero** edges.
+Buckets bigger than their cap are skipped outright, because a device seen on three hundred transactions is a payment terminal rather than a ring. Pairs are only compared inside a shared attribute, never across the whole batch, so the cost stays close to linear. The worst case, five thousand transactions with every one of them flagged, takes 3.9 seconds.
 
-Pairs are only compared inside a shared-attribute bucket, never across the whole batch, so
-cost stays near-linear. Worst case at the 5,000-transaction request ceiling, with every row
-flagged, is **3.9s**.
+<!-- screenshot: the graph tab on CASE-F4565612E2, three customers converging on one device -->
 
-## Evaluation
+## Measuring it
 
-Measured by [`scripts/evaluate.py`](scripts/evaluate.py) against a labelled dataset of 470
-transactions, 30 of them fraudulent (6.4%) across four injected rings.
+The bundled dataset holds 470 transactions, 30 of them fraudulent across four planted rings.
 
 | Threshold | Flagged | Precision | Recall | F1 | Cases |
-|-----------|---------|-----------|--------|-------|-------|
+|---|---|---|---|---|---|
 | 0.30 | 33 | 0.909 | 1.000 | 0.952 | 7 |
 | 0.40 | 31 | 0.968 | 1.000 | 0.984 | 5 |
-| **0.50** | **30** | **1.000** | **1.000** | **1.000** | **4** |
+| 0.50 | 30 | 1.000 | 1.000 | 1.000 | 4 |
 | 0.60 | 30 | 1.000 | 1.000 | 1.000 | 4 |
 | 0.70 | 30 | 1.000 | 1.000 | 1.000 | 4 |
 | 0.80 | 24 | 1.000 | 0.800 | 0.889 | 3 |
 
-Each of the four rings is recovered completely, and the 30 flagged transactions cluster into
-exactly four cases with no cross-contamination.
+All four rings come back whole, and the thirty flagged transactions land in exactly four cases with nothing crossing between them.
 
-> **Read these numbers honestly.** The data is synthetic and I wrote the rules knowing which
-> patterns the generator injects, so this measures *"the pipeline works end to end"*, not
-> *"this will get 100% on your traffic"*. What the sweep does show is that 0.5 is not a
-> cherry-picked operating point: there is a stable plateau from 0.5 to 0.7, and it degrades
-> sensibly on both sides — 0.3 admits false positives, 0.8 starts dropping the structuring
-> ring, which scores 0.750. On real traffic every threshold and weight here would need
-> recalibrating against labelled outcomes.
+Those numbers deserve a caveat, and a large one. The data is synthetic and I wrote the rules already knowing which patterns the generator plants, so a perfect score measures whether the pipeline works end to end and says nothing about how it would do on real traffic. What the sweep does show is that 0.5 was not picked to flatter the result. There is a plateau from 0.5 to 0.7 and it comes apart sensibly on either side: 0.3 starts admitting false positives, and 0.8 loses the structuring ring, which scores 0.750. On real data every weight and threshold in the table above would need rebuilding against labelled outcomes.
 
-## Architecture
+## Writing up a case
+
+An analyst does not want a number, they want a paragraph they can put in a file. Claude produces that from the case evidence using structured output, so there is no free text to parse and nothing to break when the wording drifts.
+
+There is always a fallback. No key, a refusal, a truncated response, a network failure, anything at all, and the case gets a deterministic write-up assembled from the same rule explanations. It is less fluent and it is never absent. The interface says which one produced the text, because a fallback nobody discloses is the kind of thing that makes a reviewer doubt everything else on the page.
+
+<!-- screenshot: the narrative tab, showing the model chip -->
+
+The public demo also rations the paid path. Over the limit you still get a usable summary rather than an error, marked as rate limited.
+
+## How it fits together
+
+The HTTP API and the MCP server are two doors onto one engine. Nothing is implemented twice, so the two cannot drift apart and start disagreeing about what a case is.
 
 ```mermaid
 flowchart LR
-    Browser["React SPA<br/>Vite · MUI"]
-    Claude["Claude<br/>via MCP"]
+    Browser["React SPA"]
+    Claude["Claude"]
 
-    subgraph Vercel
+    subgraph Engine["Detection engine, pure Python"]
       direction TB
-      Static["Static assets"]
-      API["Flask<br/>/api/*"]
+      Rules["ten rules"] --> Scoring["noisy-OR"] --> Graph["similarity graph"]
     end
 
-    subgraph Engine["Detection engine (pure Python)"]
-      direction TB
-      Rules["10 rules<br/>→ RuleHit"]
-      Scoring["noisy-OR<br/>→ absolute risk"]
-      Graph["similarity graph<br/>hub suppression"]
-      Rules --> Scoring --> Graph
-    end
+    Anthropic["Anthropic API"]
+    Template["Template write-up"]
 
-    Anthropic["Anthropic API<br/>structured output"]
-    Template["Template narrative<br/>(always available)"]
-
-    Browser --> Static
-    Browser --> API
-    API --> Engine
+    Browser --> API["Flask /api"] --> Engine
     Claude --> MCP["MCP server"] --> Engine
     Engine --> Anthropic
     Anthropic -. "any failure" .-> Template
 ```
 
-The HTTP API and the MCP server are two front doors onto the *same* engine — no duplicated
-logic, so they cannot drift apart.
+### Endpoints
 
-## MCP server
+| Method | Path | What it does | Needs a key |
+|---|---|---|---|
+| `GET` | `/api/health` | Liveness, and whether a model is configured | no |
+| `GET` | `/api/demo` | The bundled dataset | no |
+| `POST` | `/api/analyze` | Transactions in, cases out | no |
+| `POST` | `/api/summarize` | A case in, a write-up out | for the model path |
 
-The engine is also an MCP server, so Claude can investigate a dataset directly:
+`/api/analyze` takes a bare array or an object with a `transactions` key, caps the batch at five thousand, and checks the size before parsing so an oversized request costs nothing. A case that comes out of it goes back into `/api/summarize` unchanged, which sounds obvious and was not true of the first version.
 
-| Tool | Purpose |
-|---|---|
-| `load_demo_dataset` | Load the bundled 470-transaction dataset |
-| `analyze_transactions` | Score, cluster, and return cases |
-| `summarize_case` | Write up one case |
-| `explain_rules` | Weights, the noisy-OR formula, severity bands |
+## Investigating from Claude
+
+The same engine is an MCP server, so Claude can work a dataset directly.
 
 ```bash
 fastmcp run backend/mcp_server.py
 ```
 
-`explain_rules` is what makes the difference between Claude relaying a score and Claude
-explaining one.
+| Tool | What it does |
+|---|---|
+| `load_demo_dataset` | Loads the bundled 470 transactions |
+| `analyze_transactions` | Scores, clusters, returns cases |
+| `summarize_case` | Writes up one case |
+| `explain_rules` | Weights, the formula, the severity bands |
 
-## Running locally
+`explain_rules` is the one that matters. Without it Claude can repeat a score back to you. With it, Claude can tell you why the number is what it is.
+
+Invalid rows are rejected by index rather than skipped. The first version caught the error per row and carried on, so a malformed transaction vanished and the analysis quietly covered fewer rows than were submitted, with nothing anywhere to say so.
+
+<!-- screenshot or clip: Claude chaining the tools -->
+
+## Running it
 
 ```bash
 git clone https://github.com/parthpatel2211/FraudDetectionAgent.git
 cd FraudDetectionAgent
-```
-
-Backend:
-
-```bash
 python -m venv .venv && .venv/Scripts/pip install -r requirements-dev.txt
 ```
 
 ```bash
 cp .env.example .env
-```
-
-```bash
 .venv/Scripts/python -m backend.app
 ```
 
-Frontend, in a second terminal:
+The frontend runs separately:
 
 ```bash
 cd frontend && npm install && npm run dev
 ```
 
-Open http://localhost:5173. The Vite dev server proxies `/api` to Flask, so there is no CORS
-configuration and no API host to set.
+Open `http://localhost:5173` and press "Load demo dataset". Vite proxies `/api` to Flask, so there is no CORS to configure and no host to set anywhere.
 
-**The Anthropic key is optional.** Without it every summary comes from the deterministic
-template and the UI labels it as such. With it, set `ANTHROPIC_API_KEY` in `.env`.
+An API key is optional. Without one every write-up comes from the template and the interface says so. With one, put `ANTHROPIC_API_KEY` in `.env`.
 
-Tests:
+### Tests
 
 ```bash
-.venv/Scripts/python -m pytest --cov=backend
+.venv/Scripts/python -m pytest --cov=backend    # 165 tests
+ruff check .
+cd frontend && npm test                          # 56 tests
 ```
 
-```bash
-cd frontend && npm test
-```
+The interesting ones are regressions rather than coverage. A clean batch has to produce no cases. Forty customers at one merchant have to produce no edges. Analysing batch A, then a batch with a different channel, then batch A again has to give byte-identical results. A failed request must never leave the interface stuck loading, which the first version did, because a rejected fetch threw straight past the line meant to reset it.
+
+### The sample data
+
+The dataset comes from a committed script rather than appearing as a file with no history. You can read what was planted and then watch the tool find it: three customers on one device, a card-testing run, a customer in two countries twenty minutes apart, and six transfers sized to stay under ten thousand.
 
 ```bash
+.venv/Scripts/python data/generate.py
 .venv/Scripts/python scripts/evaluate.py
 ```
 
-## Tech stack
+Both are deterministic. The generator takes a seed and anchors on a fixed timestamp, so the committed fixtures do not churn and the evaluation numbers above can be checked rather than believed.
 
-**Backend** — Python 3.12, Flask, Pydantic v2, NetworkX, Anthropic SDK, FastMCP.
-No pandas, no scikit-learn: the engine is pure Python, which keeps the deployed dependency
-set at **6.6 MB** and cold starts short.
+## What it does not do
 
-**Frontend** — React 19, Vite, MUI 7, react-force-graph-2d.
+Nothing is persisted. Cases live for the length of a request and a reload loses them. There is no case status, no assignment, no audit trail, none of the things that separate a detector from something an investigations team could work in.
 
-**Quality** — pytest (97% backend coverage), Vitest (56 tests), ruff, GitHub Actions.
+The rules are hand-tuned. Every weight is a judgement call calibrated against one synthetic dataset, and I would not trust any of them against real traffic without recalibrating first.
 
-## Project layout
+It scores batches, not streams. Real fraud detection is a streaming problem and this is not that.
 
-```
-backend/
-  engine/      context · rules · scoring · graph · detector
-  narrative/   template (always) · llm (when a key is set)
-  app.py       Flask API
-  mcp_server.py
-api/index.py   Vercel entrypoint
-data/          seeded generator + committed fixtures
-scripts/       evaluate.py
-frontend/src/  components · hooks · lib
-tests/         125 backend tests
-```
+Off-hours means off-hours in UTC, because the data carries no timezone. For a customer in Singapore the rule is measuring the wrong thing.
 
-## Limitations, honestly
+The rate limiter counts per process, and serverless processes do not share memory, so it is a speed bump rather than a guarantee. The real ceiling is the spend limit on the API key.
 
-- **The data is synthetic.** The generator and the rules were written by the same person, so
-  the evaluation demonstrates the pipeline rather than predicting field accuracy.
-- **The rules are hand-tuned, not learned.** Every weight and threshold is a judgement call
-  calibrated against this dataset. Real deployment needs labelled outcomes and recalibration.
-- **No persistence.** Cases live in memory for the duration of a request; reloading loses
-  them. There is no case status, no assignment, no audit trail — all of which a real
-  investigation tool needs.
-- **The rate limiter is per-instance.** Serverless instances do not share state, so it is a
-  speed bump. The real cost ceiling is the spend limit on the API key.
-- **Batch only.** Real fraud detection is a streaming problem; this scores a batch on demand.
-- **Off-hours is UTC.** With no customer timezone, "3am" is an assumption.
+The GitHub Pages demo has no backend at all, so uploads and live write-ups only work locally or on Vercel.
 
-## What I would do next
+## Built with
 
-1. Persist cases with status, assignment, and an audit trail — the gap between a detector
-   and an investigation tool.
-2. Add a supervised layer over the rule outputs once labelled outcomes exist, keeping the
-   rules as explainable features rather than replacing them.
-3. Move to streaming ingestion with incremental graph updates.
-4. Precision/recall tracking per rule over time, so weight drift is visible.
+Python 3.12, Flask, Pydantic, NetworkX, the Anthropic SDK, FastMCP, pytest, and ruff on the backend. React 19, Vite, MUI, react-force-graph-2d, and Vitest on the frontend. GitHub Actions around the outside, with Vercel for the full deployment and GitHub Pages for the static one.
+
+There is no pandas and no scikit-learn. The engine is ordinary Python over dataclasses, which keeps the deployed dependencies at 6.6 MB against roughly 200 MB for the version that imported a modelling stack. That is the difference between fitting in a free serverless tier and not.
+
+Severity colours are defined once and read by the badges, the graph, and the summary tiles, so a case cannot look critical in one place and merely high in another. Transaction nodes in the graph are tinted by their own risk and sized by amount. Links that cleared the similarity threshold are drawn solid and the weaker ones dashed, so you can see which connections actually made the case.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
