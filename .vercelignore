@@ -1,0 +1,17 @@
+# Keep the serverless function bundle small and the build fast.
+.venv/
+venv/
+**/__pycache__/
+.pytest_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+tests/
+scripts/
+docs/
+
+frontend/node_modules/
+frontend/dist/
+
+# data/ is NOT ignored: /api/demo reads demo_transactions.json at runtime.
