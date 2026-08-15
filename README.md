@@ -10,7 +10,7 @@ Finds coordinated fraud rings in transaction data, groups them into cases, and s
 
 Press "Load demo dataset" and you get four fraud cases with their evidence, their graphs, and their write-ups. The hosted demo runs on GitHub Pages, which serves files and nothing else, so the detection engine there ran at build time rather than when you clicked. Uploading your own data needs the API, which means running it locally or deploying the Vercel config.
 
-<!-- screenshot: the workspace, dark theme, a case selected -->
+![The workspace with a case selected: summary tiles, the four cases, and the evidence behind the selected one](docs/screenshots/workspace.png)
 
 ## What it does
 
@@ -73,7 +73,7 @@ Because the operation is associative, a rule that fires several times folds into
 
 The result is bounded, it never falls when evidence is added, and it does not depend on what else was in the batch. That last property is the one worth having: 0.85 means the same thing in a batch of fifty and a batch of fifty thousand, so a fixed threshold is meaningful and a clean batch can return nothing at all.
 
-<!-- screenshot: the signals tab, showing contributions and evidence chips -->
+![The signals tab for the shared-device ring: each rule with its contribution, the sentence it wrote, and the transactions it implicates](docs/screenshots/signals.png)
 
 ## Why the graph exists
 
@@ -83,7 +83,7 @@ That merchant weight is the interesting one. Merchant is the single attribute co
 
 Buckets bigger than their cap are skipped outright, because a device seen on three hundred transactions is a payment terminal rather than a ring. Pairs are only compared inside a shared attribute, never across the whole batch, so the cost stays close to linear. The worst case, five thousand transactions with every one of them flagged, takes 3.9 seconds.
 
-<!-- screenshot: the graph tab on CASE-F4565612E2, three customers converging on one device -->
+![The graph for CASE-F4565612E2: three customers and their accounts converging on one shared device and IP](docs/screenshots/graph.png)
 
 ## Measuring it
 

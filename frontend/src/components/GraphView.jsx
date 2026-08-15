@@ -185,6 +185,11 @@ export default function GraphView({ graph, onSelectTransaction }) {
             linkWidth={(l) => (l.weight >= LINK_THRESHOLD ? 1 + l.weight * 2 : 0.6)}
             linkLineDash={(l) => (l.weight >= LINK_THRESHOLD ? null : [3, 3])}
             cooldownTicks={90}
+            // The force layout settles wherever it settles, which on a small
+            // case is a knot in the middle of a mostly empty canvas, below the
+            // scale at which labels are drawn at all. Fit the graph to the box
+            // once it stops moving so the default view is the readable one.
+            onEngineStop={() => fgRef.current?.zoomToFit(400, 60)}
             onNodeClick={(n) => n.kind === "transaction" && onSelectTransaction?.(n.id)}
           />
         )}
