@@ -130,6 +130,32 @@ def test_signal_tx_ids_stay_inside_their_case(demo_transactions):
             assert set(s.tx_ids) <= member_ids
 
 
+def test_displayed_signals_reconstruct_the_case_score(demo_transactions):
+    """An analyst adding up the shown evidence must arrive at the shown score.
+
+    Before signals aggregated per rule, the panel showed only the strongest
+    instance of each while the score counted every instance: the shared-device
+    case displayed evidence worth 0.935 against a reported 0.981.
+    """
+    from backend.engine.scoring import noisy_or
+
+    for case in FraudDetector().analyze(demo_transactions).cases:
+        survival = 1.0
+        for s in case.signals:
+            survival *= 1 - s.contribution
+        assert abs((1 - survival) - case.risk_score) < 0.002, case.case_id
+
+    # Guard the maths itself, not just this dataset.
+    assert noisy_or([]) == 0.0
+
+
+def test_signals_report_how_many_times_a_rule_fired(demo_transactions):
+    cases = FraudDetector().analyze(demo_transactions).cases
+    counts = [s.instances for c in cases for s in c.signals]
+    assert all(n >= 1 for n in counts)
+    assert any(n > 1 for n in counts), "expected at least one repeated rule"
+
+
 def test_no_duplicate_rules_within_a_case(demo_transactions):
     for case in FraudDetector().analyze(demo_transactions).cases:
         rules = [s.rule for s in case.signals]

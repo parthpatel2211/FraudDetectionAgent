@@ -97,25 +97,38 @@ class FraudDetector:
 
     @staticmethod
     def _to_signals(hits: list[RuleHit], member_ids: set[str]) -> list[Signal]:
-        """One signal per rule, keeping the strongest instance of each."""
-        best: dict[str, RuleHit] = {}
-        for h in hits:
-            if h.rule not in best or h.score > best[h.rule].score:
-                best[h.rule] = h
+        """One signal per rule, aggregating every instance of that rule.
 
-        signals = [
-            Signal(
-                rule=h.rule,
-                label=h.label,
-                score=h.score,
-                weight=h.weight,
-                contribution=round(h.weight * h.score, 4),
-                explanation=h.explanation,
+        A rule can fire several times in one case - once per customer in a ring,
+        say. Displaying only the strongest instance while scoring all of them
+        made the panel disagree with the score: the shared-device case showed
+        evidence summing to 0.935 against a reported 0.981. Because noisy-OR is
+        associative, folding each rule's instances into one contribution lets
+        the displayed evidence reproduce the case score exactly.
+        """
+        grouped: dict[str, list[RuleHit]] = {}
+        for h in hits:
+            grouped.setdefault(h.rule, []).append(h)
+
+        signals: list[Signal] = []
+        for rule, rule_hits in grouped.items():
+            strongest = max(rule_hits, key=lambda h: h.score)
+            ids: set[str] = set()
+            for h in rule_hits:
+                ids |= set(h.tx_ids)
+
+            signals.append(Signal(
+                rule=rule,
+                label=strongest.label,
+                score=strongest.score,
+                weight=strongest.weight,
+                contribution=round(noisy_or(rule_hits), 4),
+                instances=len(rule_hits),
+                explanation=strongest.explanation,
                 # Clipped to the case: a signal must not cite evidence the
                 # analyst cannot see in front of them.
-                tx_ids=sorted(set(h.tx_ids) & member_ids),
-            )
-            for h in best.values()
-        ]
+                tx_ids=sorted(ids & member_ids),
+            ))
+
         signals.sort(key=lambda s: (-s.contribution, s.rule))
         return signals

@@ -178,7 +178,7 @@
               "ip_address=198.51.100.88",
               "merchant_id=M-AIRLINE"
             ],
-            "source": "TX-G001",
+            "source": "TX-G002",
             "target": "TX-G000",
             "weight": 1.0
           },
@@ -190,8 +190,8 @@
               "ip_address=198.51.100.88",
               "merchant_id=M-AIRLINE"
             ],
-            "source": "TX-G001",
-            "target": "TX-G002",
+            "source": "TX-G002",
+            "target": "TX-G001",
             "weight": 1.0
           },
           {
@@ -202,31 +202,7 @@
               "ip_address=198.51.100.88",
               "merchant_id=M-AIRLINE"
             ],
-            "source": "TX-G001",
-            "target": "TX-G003",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=TRAVEL-01",
-              "account_id=ACC-TRAVEL-01",
-              "device_id=DEV-TRAVEL-01",
-              "ip_address=198.51.100.88",
-              "merchant_id=M-AIRLINE"
-            ],
-            "source": "TX-G000",
-            "target": "TX-G002",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=TRAVEL-01",
-              "account_id=ACC-TRAVEL-01",
-              "device_id=DEV-TRAVEL-01",
-              "ip_address=198.51.100.88",
-              "merchant_id=M-AIRLINE"
-            ],
-            "source": "TX-G000",
+            "source": "TX-G002",
             "target": "TX-G003",
             "weight": 1.0
           },
@@ -239,7 +215,31 @@
               "merchant_id=M-AIRLINE"
             ],
             "source": "TX-G003",
-            "target": "TX-G002",
+            "target": "TX-G000",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=TRAVEL-01",
+              "account_id=ACC-TRAVEL-01",
+              "device_id=DEV-TRAVEL-01",
+              "ip_address=198.51.100.88",
+              "merchant_id=M-AIRLINE"
+            ],
+            "source": "TX-G003",
+            "target": "TX-G001",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=TRAVEL-01",
+              "account_id=ACC-TRAVEL-01",
+              "device_id=DEV-TRAVEL-01",
+              "ip_address=198.51.100.88",
+              "merchant_id=M-AIRLINE"
+            ],
+            "source": "TX-G000",
+            "target": "TX-G001",
             "weight": 1.0
           }
         ],
@@ -313,20 +313,24 @@
       "severity": "critical",
       "signals": [
         {
-          "contribution": 0.9,
+          "contribution": 0.999,
           "explanation": "Customer TRAVEL-01 transacted in US then SG 29 minutes apart.",
+          "instances": 3,
           "label": "Geographically impossible sequence",
           "rule": "impossible_travel",
           "score": 1.0,
           "tx_ids": [
             "TX-G000",
-            "TX-G001"
+            "TX-G001",
+            "TX-G002",
+            "TX-G003"
           ],
           "weight": 0.9
         },
         {
           "contribution": 0.45,
           "explanation": "Transaction of 634.71 USD is 14.7 standard deviations above customer TRAVEL-01's baseline of 526.19 USD (computed excluding this transaction).",
+          "instances": 1,
           "label": "Amount far outside customer baseline",
           "rule": "amount_zscore",
           "score": 1.0,
@@ -787,29 +791,29 @@
               "ip_address=198.51.100.7",
               "merchant_id=M-ELECTRONICS"
             ],
-            "source": "TX-D006",
-            "target": "TX-D000",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=MULE-00",
-              "account_id=ACC-MULE-00",
-              "device_id=DEV-SHARED-01",
-              "ip_address=198.51.100.7",
-              "merchant_id=M-ELECTRONICS"
-            ],
-            "source": "TX-D006",
+            "source": "TX-D000",
             "target": "TX-D003",
             "weight": 1.0
           },
           {
             "reasons": [
+              "customer_id=MULE-00",
+              "account_id=ACC-MULE-00",
               "device_id=DEV-SHARED-01",
               "ip_address=198.51.100.7",
               "merchant_id=M-ELECTRONICS"
             ],
-            "source": "TX-D006",
+            "source": "TX-D000",
+            "target": "TX-D006",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "device_id=DEV-SHARED-01",
+              "ip_address=198.51.100.7",
+              "merchant_id=M-ELECTRONICS"
+            ],
+            "source": "TX-D000",
             "target": "TX-D001",
             "weight": 1.0
           },
@@ -819,7 +823,7 @@
               "ip_address=198.51.100.7",
               "merchant_id=M-ELECTRONICS"
             ],
-            "source": "TX-D006",
+            "source": "TX-D000",
             "target": "TX-D002",
             "weight": 1.0
           },
@@ -829,7 +833,7 @@
               "ip_address=198.51.100.7",
               "merchant_id=M-ELECTRONICS"
             ],
-            "source": "TX-D006",
+            "source": "TX-D000",
             "target": "TX-D004",
             "weight": 1.0
           },
@@ -839,7 +843,7 @@
               "ip_address=198.51.100.7",
               "merchant_id=M-ELECTRONICS"
             ],
-            "source": "TX-D006",
+            "source": "TX-D000",
             "target": "TX-D005",
             "weight": 1.0
           },
@@ -849,7 +853,7 @@
               "ip_address=198.51.100.7",
               "merchant_id=M-ELECTRONICS"
             ],
-            "source": "TX-D006",
+            "source": "TX-D000",
             "target": "TX-D007",
             "weight": 1.0
           },
@@ -859,7 +863,7 @@
               "ip_address=198.51.100.7",
               "merchant_id=M-ELECTRONICS"
             ],
-            "source": "TX-D006",
+            "source": "TX-D000",
             "target": "TX-D008",
             "weight": 1.0
           },
@@ -872,7 +876,7 @@
               "merchant_id=M-ELECTRONICS"
             ],
             "source": "TX-D003",
-            "target": "TX-D000",
+            "target": "TX-D006",
             "weight": 1.0
           },
           {
@@ -937,6 +941,70 @@
           },
           {
             "reasons": [
+              "customer_id=MULE-02",
+              "account_id=ACC-MULE-02",
+              "device_id=DEV-SHARED-01",
+              "ip_address=198.51.100.7",
+              "merchant_id=M-ELECTRONICS"
+            ],
+            "source": "TX-D002",
+            "target": "TX-D005",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=MULE-02",
+              "account_id=ACC-MULE-02",
+              "device_id=DEV-SHARED-01",
+              "ip_address=198.51.100.7",
+              "merchant_id=M-ELECTRONICS"
+            ],
+            "source": "TX-D002",
+            "target": "TX-D008",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "device_id=DEV-SHARED-01",
+              "ip_address=198.51.100.7",
+              "merchant_id=M-ELECTRONICS"
+            ],
+            "source": "TX-D002",
+            "target": "TX-D001",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "device_id=DEV-SHARED-01",
+              "ip_address=198.51.100.7",
+              "merchant_id=M-ELECTRONICS"
+            ],
+            "source": "TX-D002",
+            "target": "TX-D004",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "device_id=DEV-SHARED-01",
+              "ip_address=198.51.100.7",
+              "merchant_id=M-ELECTRONICS"
+            ],
+            "source": "TX-D002",
+            "target": "TX-D006",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "device_id=DEV-SHARED-01",
+              "ip_address=198.51.100.7",
+              "merchant_id=M-ELECTRONICS"
+            ],
+            "source": "TX-D002",
+            "target": "TX-D007",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
               "customer_id=MULE-01",
               "account_id=ACC-MULE-01",
               "device_id=DEV-SHARED-01",
@@ -966,27 +1034,17 @@
               "merchant_id=M-ELECTRONICS"
             ],
             "source": "TX-D007",
-            "target": "TX-D000",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "device_id=DEV-SHARED-01",
-              "ip_address=198.51.100.7",
-              "merchant_id=M-ELECTRONICS"
-            ],
-            "source": "TX-D007",
-            "target": "TX-D002",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "device_id=DEV-SHARED-01",
-              "ip_address=198.51.100.7",
-              "merchant_id=M-ELECTRONICS"
-            ],
-            "source": "TX-D007",
             "target": "TX-D005",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "device_id=DEV-SHARED-01",
+              "ip_address=198.51.100.7",
+              "merchant_id=M-ELECTRONICS"
+            ],
+            "source": "TX-D007",
+            "target": "TX-D006",
             "weight": 1.0
           },
           {
@@ -1005,7 +1063,7 @@
               "ip_address=198.51.100.7",
               "merchant_id=M-ELECTRONICS"
             ],
-            "source": "TX-D000",
+            "source": "TX-D006",
             "target": "TX-D001",
             "weight": 1.0
           },
@@ -1015,17 +1073,7 @@
               "ip_address=198.51.100.7",
               "merchant_id=M-ELECTRONICS"
             ],
-            "source": "TX-D000",
-            "target": "TX-D002",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "device_id=DEV-SHARED-01",
-              "ip_address=198.51.100.7",
-              "merchant_id=M-ELECTRONICS"
-            ],
-            "source": "TX-D000",
+            "source": "TX-D006",
             "target": "TX-D004",
             "weight": 1.0
           },
@@ -1035,7 +1083,7 @@
               "ip_address=198.51.100.7",
               "merchant_id=M-ELECTRONICS"
             ],
-            "source": "TX-D000",
+            "source": "TX-D006",
             "target": "TX-D005",
             "weight": 1.0
           },
@@ -1045,49 +1093,7 @@
               "ip_address=198.51.100.7",
               "merchant_id=M-ELECTRONICS"
             ],
-            "source": "TX-D000",
-            "target": "TX-D008",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=MULE-01",
-              "account_id=ACC-MULE-01",
-              "device_id=DEV-SHARED-01",
-              "ip_address=198.51.100.7",
-              "merchant_id=M-ELECTRONICS"
-            ],
-            "source": "TX-D001",
-            "target": "TX-D004",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "device_id=DEV-SHARED-01",
-              "ip_address=198.51.100.7",
-              "merchant_id=M-ELECTRONICS"
-            ],
-            "source": "TX-D001",
-            "target": "TX-D002",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "device_id=DEV-SHARED-01",
-              "ip_address=198.51.100.7",
-              "merchant_id=M-ELECTRONICS"
-            ],
-            "source": "TX-D001",
-            "target": "TX-D005",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "device_id=DEV-SHARED-01",
-              "ip_address=198.51.100.7",
-              "merchant_id=M-ELECTRONICS"
-            ],
-            "source": "TX-D001",
+            "source": "TX-D006",
             "target": "TX-D008",
             "weight": 1.0
           },
@@ -1099,20 +1105,18 @@
               "ip_address=198.51.100.7",
               "merchant_id=M-ELECTRONICS"
             ],
-            "source": "TX-D002",
+            "source": "TX-D008",
             "target": "TX-D005",
             "weight": 1.0
           },
           {
             "reasons": [
-              "customer_id=MULE-02",
-              "account_id=ACC-MULE-02",
               "device_id=DEV-SHARED-01",
               "ip_address=198.51.100.7",
               "merchant_id=M-ELECTRONICS"
             ],
-            "source": "TX-D002",
-            "target": "TX-D008",
+            "source": "TX-D008",
+            "target": "TX-D001",
             "weight": 1.0
           },
           {
@@ -1121,40 +1125,40 @@
               "ip_address=198.51.100.7",
               "merchant_id=M-ELECTRONICS"
             ],
-            "source": "TX-D002",
+            "source": "TX-D008",
             "target": "TX-D004",
             "weight": 1.0
           },
           {
             "reasons": [
-              "device_id=DEV-SHARED-01",
-              "ip_address=198.51.100.7",
-              "merchant_id=M-ELECTRONICS"
-            ],
-            "source": "TX-D004",
-            "target": "TX-D005",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "device_id=DEV-SHARED-01",
-              "ip_address=198.51.100.7",
-              "merchant_id=M-ELECTRONICS"
-            ],
-            "source": "TX-D004",
-            "target": "TX-D008",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=MULE-02",
-              "account_id=ACC-MULE-02",
               "device_id=DEV-SHARED-01",
               "ip_address=198.51.100.7",
               "merchant_id=M-ELECTRONICS"
             ],
             "source": "TX-D005",
-            "target": "TX-D008",
+            "target": "TX-D001",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "device_id=DEV-SHARED-01",
+              "ip_address=198.51.100.7",
+              "merchant_id=M-ELECTRONICS"
+            ],
+            "source": "TX-D005",
+            "target": "TX-D004",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=MULE-01",
+              "account_id=ACC-MULE-01",
+              "device_id=DEV-SHARED-01",
+              "ip_address=198.51.100.7",
+              "merchant_id=M-ELECTRONICS"
+            ],
+            "source": "TX-D004",
+            "target": "TX-D001",
             "weight": 1.0
           }
         ],
@@ -1293,6 +1297,7 @@
         {
           "contribution": 0.85,
           "explanation": "Device DEV-SHARED-01 was used by 3 distinct customers (MULE-00, MULE-01, MULE-02) across 9 transactions.",
+          "instances": 1,
           "label": "Shared device across customers",
           "rule": "shared_device_ring",
           "score": 1.0,
@@ -1310,21 +1315,29 @@
           "weight": 0.85
         },
         {
-          "contribution": 0.4667,
+          "contribution": 0.8483,
           "explanation": "Customer MULE-00 escalated from 597.76 to 2,308.68 USD at merchant M-ELECTRONICS across 3 transactions in 25 minutes.",
+          "instances": 3,
           "label": "Escalating amounts at one merchant",
           "rule": "rapid_escalation",
           "score": 0.6666666666666666,
           "tx_ids": [
             "TX-D000",
+            "TX-D001",
+            "TX-D002",
             "TX-D003",
-            "TX-D006"
+            "TX-D004",
+            "TX-D005",
+            "TX-D006",
+            "TX-D007",
+            "TX-D008"
           ],
           "weight": 0.7
         },
         {
           "contribution": 0.1833,
           "explanation": "IP 198.51.100.7 served 3 distinct customers across 9 transactions.",
+          "instances": 1,
           "label": "Shared IP across customers",
           "rule": "shared_ip_ring",
           "score": 0.3333333333333333,
@@ -1933,7 +1946,7 @@
               "device_id=DEV-TEST-09",
               "ip_address=198.51.100.42"
             ],
-            "source": "TX-T006",
+            "source": "TX-T100",
             "target": "TX-T000",
             "weight": 1.0
           },
@@ -1944,7 +1957,7 @@
               "device_id=DEV-TEST-09",
               "ip_address=198.51.100.42"
             ],
-            "source": "TX-T006",
+            "source": "TX-T100",
             "target": "TX-T001",
             "weight": 1.0
           },
@@ -1955,8 +1968,517 @@
               "device_id=DEV-TEST-09",
               "ip_address=198.51.100.42"
             ],
-            "source": "TX-T006",
+            "source": "TX-T100",
             "target": "TX-T002",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T100",
+            "target": "TX-T003",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T100",
+            "target": "TX-T004",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T100",
+            "target": "TX-T005",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T100",
+            "target": "TX-T006",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T100",
+            "target": "TX-T007",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42",
+              "merchant_id=M-ELECTRONICS"
+            ],
+            "source": "TX-T100",
+            "target": "TX-T101",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42",
+              "merchant_id=M-ELECTRONICS"
+            ],
+            "source": "TX-T100",
+            "target": "TX-T102",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T101",
+            "target": "TX-T000",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T101",
+            "target": "TX-T001",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T101",
+            "target": "TX-T002",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T101",
+            "target": "TX-T003",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T101",
+            "target": "TX-T004",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T101",
+            "target": "TX-T005",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T101",
+            "target": "TX-T006",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T101",
+            "target": "TX-T007",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42",
+              "merchant_id=M-ELECTRONICS"
+            ],
+            "source": "TX-T101",
+            "target": "TX-T102",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T000",
+            "target": "TX-T001",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T000",
+            "target": "TX-T002",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T000",
+            "target": "TX-T003",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T000",
+            "target": "TX-T004",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T000",
+            "target": "TX-T005",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T000",
+            "target": "TX-T006",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T000",
+            "target": "TX-T007",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T000",
+            "target": "TX-T102",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T002",
+            "target": "TX-T001",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T002",
+            "target": "TX-T003",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T002",
+            "target": "TX-T004",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T002",
+            "target": "TX-T005",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T002",
+            "target": "TX-T006",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T002",
+            "target": "TX-T007",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T002",
+            "target": "TX-T102",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T001",
+            "target": "TX-T003",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T001",
+            "target": "TX-T004",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T001",
+            "target": "TX-T005",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T001",
+            "target": "TX-T006",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T001",
+            "target": "TX-T007",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T001",
+            "target": "TX-T102",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T004",
+            "target": "TX-T003",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T004",
+            "target": "TX-T005",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T004",
+            "target": "TX-T006",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T004",
+            "target": "TX-T007",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T004",
+            "target": "TX-T102",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T005",
+            "target": "TX-T003",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T005",
+            "target": "TX-T006",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T005",
+            "target": "TX-T007",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=VICTIM-01",
+              "account_id=ACC-VICTIM-01",
+              "device_id=DEV-TEST-09",
+              "ip_address=198.51.100.42"
+            ],
+            "source": "TX-T005",
+            "target": "TX-T102",
             "weight": 1.0
           },
           {
@@ -1968,28 +2490,6 @@
             ],
             "source": "TX-T006",
             "target": "TX-T003",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T006",
-            "target": "TX-T004",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T006",
-            "target": "TX-T005",
             "weight": 1.0
           },
           {
@@ -2011,62 +2511,7 @@
               "ip_address=198.51.100.42"
             ],
             "source": "TX-T006",
-            "target": "TX-T100",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T006",
-            "target": "TX-T101",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T006",
             "target": "TX-T102",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T007",
-            "target": "TX-T000",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T007",
-            "target": "TX-T001",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T007",
-            "target": "TX-T002",
             "weight": 1.0
           },
           {
@@ -2088,140 +2533,6 @@
               "ip_address=198.51.100.42"
             ],
             "source": "TX-T007",
-            "target": "TX-T004",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T007",
-            "target": "TX-T005",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T007",
-            "target": "TX-T100",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T007",
-            "target": "TX-T101",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T007",
-            "target": "TX-T102",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T101",
-            "target": "TX-T000",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T101",
-            "target": "TX-T001",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T101",
-            "target": "TX-T002",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T101",
-            "target": "TX-T003",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T101",
-            "target": "TX-T004",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T101",
-            "target": "TX-T005",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42",
-              "merchant_id=M-ELECTRONICS"
-            ],
-            "source": "TX-T101",
-            "target": "TX-T100",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42",
-              "merchant_id=M-ELECTRONICS"
-            ],
-            "source": "TX-T101",
             "target": "TX-T102",
             "weight": 1.0
           },
@@ -2233,305 +2544,7 @@
               "ip_address=198.51.100.42"
             ],
             "source": "TX-T003",
-            "target": "TX-T000",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T003",
-            "target": "TX-T001",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T003",
-            "target": "TX-T002",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T003",
-            "target": "TX-T004",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T003",
-            "target": "TX-T005",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T003",
-            "target": "TX-T100",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T003",
             "target": "TX-T102",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T001",
-            "target": "TX-T000",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T001",
-            "target": "TX-T002",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T001",
-            "target": "TX-T004",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T001",
-            "target": "TX-T005",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T001",
-            "target": "TX-T100",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T001",
-            "target": "TX-T102",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T102",
-            "target": "TX-T000",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T102",
-            "target": "TX-T002",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T102",
-            "target": "TX-T004",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T102",
-            "target": "TX-T005",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42",
-              "merchant_id=M-ELECTRONICS"
-            ],
-            "source": "TX-T102",
-            "target": "TX-T100",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T100",
-            "target": "TX-T000",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T100",
-            "target": "TX-T002",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T100",
-            "target": "TX-T004",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T100",
-            "target": "TX-T005",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T000",
-            "target": "TX-T002",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T000",
-            "target": "TX-T004",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T000",
-            "target": "TX-T005",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T002",
-            "target": "TX-T004",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T002",
-            "target": "TX-T005",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=VICTIM-01",
-              "account_id=ACC-VICTIM-01",
-              "device_id=DEV-TEST-09",
-              "ip_address=198.51.100.42"
-            ],
-            "source": "TX-T005",
-            "target": "TX-T004",
             "weight": 1.0
           }
         ],
@@ -2712,6 +2725,7 @@
         {
           "contribution": 0.8,
           "explanation": "Customer VICTIM-01 made 8 probe transactions under 5 USD, then 3 charge(s) up to 2,179.55 USD within 120 minutes.",
+          "instances": 1,
           "label": "Card testing followed by cash-out",
           "rule": "card_testing",
           "score": 1.0,
@@ -2733,6 +2747,7 @@
         {
           "contribution": 0.45,
           "explanation": "Customer VICTIM-01 transacted with 9 merchants never seen before within 60 minutes.",
+          "instances": 1,
           "label": "Burst of first-time merchants",
           "rule": "new_merchant_burst",
           "score": 1.0,
@@ -2752,6 +2767,7 @@
         {
           "contribution": 0.195,
           "explanation": "Customer VICTIM-01 made 8 transactions within 10 minutes.",
+          "instances": 1,
           "label": "Abnormal transaction velocity",
           "rule": "velocity",
           "score": 0.3,
@@ -3186,7 +3202,7 @@
               "ip_address=198.51.100.51",
               "merchant_id=M-TRANSIT"
             ],
-            "source": "TX-S001",
+            "source": "TX-S002",
             "target": "TX-S000",
             "weight": 1.0
           },
@@ -3198,8 +3214,92 @@
               "ip_address=198.51.100.51",
               "merchant_id=M-TRANSIT"
             ],
-            "source": "TX-S001",
-            "target": "TX-S002",
+            "source": "TX-S002",
+            "target": "TX-S001",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=STRUCT-01",
+              "account_id=ACC-STRUCT-01",
+              "device_id=DEV-STRUCT-01",
+              "ip_address=198.51.100.51",
+              "merchant_id=M-TRANSIT"
+            ],
+            "source": "TX-S002",
+            "target": "TX-S003",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=STRUCT-01",
+              "account_id=ACC-STRUCT-01",
+              "device_id=DEV-STRUCT-01",
+              "ip_address=198.51.100.51",
+              "merchant_id=M-TRANSIT"
+            ],
+            "source": "TX-S002",
+            "target": "TX-S004",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=STRUCT-01",
+              "account_id=ACC-STRUCT-01",
+              "device_id=DEV-STRUCT-01",
+              "ip_address=198.51.100.51",
+              "merchant_id=M-TRANSIT"
+            ],
+            "source": "TX-S002",
+            "target": "TX-S005",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=STRUCT-01",
+              "account_id=ACC-STRUCT-01",
+              "device_id=DEV-STRUCT-01",
+              "ip_address=198.51.100.51",
+              "merchant_id=M-TRANSIT"
+            ],
+            "source": "TX-S003",
+            "target": "TX-S000",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=STRUCT-01",
+              "account_id=ACC-STRUCT-01",
+              "device_id=DEV-STRUCT-01",
+              "ip_address=198.51.100.51",
+              "merchant_id=M-TRANSIT"
+            ],
+            "source": "TX-S003",
+            "target": "TX-S001",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=STRUCT-01",
+              "account_id=ACC-STRUCT-01",
+              "device_id=DEV-STRUCT-01",
+              "ip_address=198.51.100.51",
+              "merchant_id=M-TRANSIT"
+            ],
+            "source": "TX-S003",
+            "target": "TX-S004",
+            "weight": 1.0
+          },
+          {
+            "reasons": [
+              "customer_id=STRUCT-01",
+              "account_id=ACC-STRUCT-01",
+              "device_id=DEV-STRUCT-01",
+              "ip_address=198.51.100.51",
+              "merchant_id=M-TRANSIT"
+            ],
+            "source": "TX-S003",
+            "target": "TX-S005",
             "weight": 1.0
           },
           {
@@ -3211,7 +3311,7 @@
               "merchant_id=M-TRANSIT"
             ],
             "source": "TX-S001",
-            "target": "TX-S003",
+            "target": "TX-S000",
             "weight": 1.0
           },
           {
@@ -3259,30 +3359,6 @@
               "merchant_id=M-TRANSIT"
             ],
             "source": "TX-S004",
-            "target": "TX-S002",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=STRUCT-01",
-              "account_id=ACC-STRUCT-01",
-              "device_id=DEV-STRUCT-01",
-              "ip_address=198.51.100.51",
-              "merchant_id=M-TRANSIT"
-            ],
-            "source": "TX-S004",
-            "target": "TX-S003",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=STRUCT-01",
-              "account_id=ACC-STRUCT-01",
-              "device_id=DEV-STRUCT-01",
-              "ip_address=198.51.100.51",
-              "merchant_id=M-TRANSIT"
-            ],
-            "source": "TX-S004",
             "target": "TX-S005",
             "weight": 1.0
           },
@@ -3294,68 +3370,8 @@
               "ip_address=198.51.100.51",
               "merchant_id=M-TRANSIT"
             ],
-            "source": "TX-S002",
-            "target": "TX-S000",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=STRUCT-01",
-              "account_id=ACC-STRUCT-01",
-              "device_id=DEV-STRUCT-01",
-              "ip_address=198.51.100.51",
-              "merchant_id=M-TRANSIT"
-            ],
-            "source": "TX-S002",
-            "target": "TX-S003",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=STRUCT-01",
-              "account_id=ACC-STRUCT-01",
-              "device_id=DEV-STRUCT-01",
-              "ip_address=198.51.100.51",
-              "merchant_id=M-TRANSIT"
-            ],
-            "source": "TX-S002",
+            "source": "TX-S000",
             "target": "TX-S005",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=STRUCT-01",
-              "account_id=ACC-STRUCT-01",
-              "device_id=DEV-STRUCT-01",
-              "ip_address=198.51.100.51",
-              "merchant_id=M-TRANSIT"
-            ],
-            "source": "TX-S005",
-            "target": "TX-S000",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=STRUCT-01",
-              "account_id=ACC-STRUCT-01",
-              "device_id=DEV-STRUCT-01",
-              "ip_address=198.51.100.51",
-              "merchant_id=M-TRANSIT"
-            ],
-            "source": "TX-S005",
-            "target": "TX-S003",
-            "weight": 1.0
-          },
-          {
-            "reasons": [
-              "customer_id=STRUCT-01",
-              "account_id=ACC-STRUCT-01",
-              "device_id=DEV-STRUCT-01",
-              "ip_address=198.51.100.51",
-              "merchant_id=M-TRANSIT"
-            ],
-            "source": "TX-S003",
-            "target": "TX-S000",
             "weight": 1.0
           }
         ],
@@ -3445,6 +3461,7 @@
         {
           "contribution": 0.75,
           "explanation": "Customer STRUCT-01 moved 56,806.94 USD across 6 transactions of 8,500-10,000 USD within 24 hours.",
+          "instances": 1,
           "label": "Amounts just under a reporting threshold",
           "rule": "structuring",
           "score": 1.0,

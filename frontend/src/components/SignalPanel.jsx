@@ -30,9 +30,21 @@ export default function SignalPanel({ signals, onSelectTransaction }) {
       {signals.map((s) => (
         <Box key={s.rule}>
           <Box display="flex" justifyContent="space-between" alignItems="baseline" gap={2}>
-            <Typography variant="subtitle2">{s.label}</Typography>
+            <Typography variant="subtitle2">
+              {s.label}
+              {s.instances > 1 && (
+                <Typography component="span" variant="caption" color="text.secondary">
+                  {" "}×{s.instances}
+                </Typography>
+              )}
+            </Typography>
             <Tooltip
-              title={`weight ${s.weight.toFixed(2)} × strength ${s.score.toFixed(2)}`}
+              title={
+                s.instances > 1
+                  ? `${s.instances} occurrences combined; strongest is ` +
+                    `weight ${s.weight.toFixed(2)} × strength ${s.score.toFixed(2)}`
+                  : `weight ${s.weight.toFixed(2)} × strength ${s.score.toFixed(2)}`
+              }
             >
               <Typography variant="caption" color="text.secondary" noWrap>
                 contributes {s.contribution.toFixed(2)}

@@ -25,13 +25,20 @@ class Transaction(BaseModel):
 
 
 class Signal(BaseModel):
-    """A rule that fired, aggregated across the transactions it touched."""
+    """A rule that fired, aggregated across every instance of it in the case.
+
+    `contribution` is the noisy-OR of all instances of this rule, not just the
+    strongest one. Because noisy-OR is associative, combining the displayed
+    contributions reproduces the case's risk_score exactly - so an analyst can
+    add the evidence up and arrive at the number they were shown.
+    """
 
     rule: str
     label: str
-    score: float = Field(ge=0, le=1)
+    score: float = Field(ge=0, le=1, description="strength of the strongest instance")
     weight: float = Field(ge=0, le=1)
-    contribution: float = Field(ge=0, le=1, description="weight * score")
+    contribution: float = Field(ge=0, le=1, description="noisy-OR over all instances")
+    instances: int = Field(ge=1, default=1)
     explanation: str
     tx_ids: list[str]
 
