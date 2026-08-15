@@ -9,6 +9,25 @@ every score it produces.
 
 ---
 
+## Two ways to run it
+
+| | GitHub Pages | Vercel |
+|---|---|---|
+| Hosting | Static files only | Static SPA + Python function |
+| Detection engine | Runs at **build time**, results bundled | Runs **live** per request |
+| Explore the four demo cases | ✅ | ✅ |
+| Signals, evidence, graph, narratives | ✅ | ✅ |
+| Upload your own CSV/JSON | ❌ | ✅ |
+| Live Claude narratives | ❌ (bundled text) | ✅ |
+| Cost / cold start | Free, none | Free tier, ~1–2s |
+
+GitHub Pages has no Python runtime, so the engine cannot execute per request there.
+The Pages workflow runs the real engine during the build and bundles its output, and the
+UI says plainly that it is doing so — nothing is faked, but nothing is live either.
+`vercel.json` is the full-stack deployment.
+
+---
+
 ## The problem
 
 Most fraud scoring treats a transaction as an isolated event: score it, threshold it, alert

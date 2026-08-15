@@ -3,6 +3,9 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
+  // GitHub Pages serves from /<repo>/, Vercel from /. Set BASE_PATH in the
+  // Pages workflow; everywhere else this stays "/".
+  base: process.env.BASE_PATH || "/",
   server: {
     // Honour PORT when the environment assigns one; 5173 is just the default.
     port: Number(process.env.PORT) || 5173,

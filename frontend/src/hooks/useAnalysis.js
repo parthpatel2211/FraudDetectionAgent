@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { analyze, loadDemo, summarize } from "../api";
+import { STATIC_DEMO } from "../config";
 
 /**
  * The single owner of analysis state.
@@ -32,9 +33,31 @@ export default function useAnalysis() {
     setStatus(data.cases.length ? "ready" : "empty");
   }, []);
 
+  /** Load the analysis bundled at build time and seed its narratives. */
+  const loadBundled = useCallback(async () => {
+    const { default: bundled } = await import("../data/fallbackCases.json");
+    setSummaries(
+      Object.fromEntries(
+        bundled.cases.filter((c) => c._summary).map((c) => [c.case_id, c._summary])
+      )
+    );
+    setResult(bundled);
+    setSelectedCaseId(bundled.cases[0]?.case_id ?? null);
+    return bundled;
+  }, []);
+
   const runDemo = useCallback(async () => {
     setStatus("loading");
     setError(null);
+
+    // Static hosting (GitHub Pages) has no API to call. This is the expected
+    // path there, not a failure, so it gets its own status and no error.
+    if (STATIC_DEMO) {
+      await loadBundled();
+      setStatus("static");
+      return;
+    }
+
     try {
       settle(await analyze(await loadDemo()));
     } catch (e) {
@@ -43,16 +66,7 @@ export default function useAnalysis() {
       // Imported dynamically so the 96 kB fixture stays out of the initial
       // bundle - it is only needed when the API is unreachable.
       try {
-        const { default: fallbackResult } = await import("../data/fallbackCases.json");
-        setSummaries(
-          Object.fromEntries(
-            fallbackResult.cases
-              .filter((c) => c._summary)
-              .map((c) => [c.case_id, c._summary])
-          )
-        );
-        setResult(fallbackResult);
-        setSelectedCaseId(fallbackResult.cases[0]?.case_id ?? null);
+        await loadBundled();
         setError(e.message);
         setStatus("offline");
       } catch {
@@ -62,7 +76,7 @@ export default function useAnalysis() {
         setStatus("error");
       }
     }
-  }, [settle]);
+  }, [settle, loadBundled]);
 
   const runCustom = useCallback(
     async (transactions) => {
@@ -84,6 +98,8 @@ export default function useAnalysis() {
   const generateSummary = useCallback(
     async (caseObj) => {
       if (!caseObj) return;
+      // Nothing to call on a static host; the bundled summary is already shown.
+      if (STATIC_DEMO) return;
       setSummarizing(true);
       try {
         const summary = await summarize(stripLocalFields(caseObj));

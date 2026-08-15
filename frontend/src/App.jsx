@@ -20,6 +20,7 @@ import CaseList from "./components/CaseList";
 import StatsStrip from "./components/StatsStrip";
 import UploadZone from "./components/UploadZone";
 import { health } from "./api";
+import { REPO_URL, STATIC_DEMO } from "./config";
 import useAnalysis from "./hooks/useAnalysis";
 import { buildTheme } from "./theme";
 
@@ -35,8 +36,10 @@ export default function App() {
     window.localStorage?.setItem("fraud-agent-mode", mode);
   }, [mode]);
 
-  // Tells the narrative panel which model to name. Never blocks the UI.
+  // Tells the narrative panel which model to name. Never blocks the UI, and is
+  // skipped entirely on a static host where there is no API to ask.
   useEffect(() => {
+    if (STATIC_DEMO) return;
     health()
       .then((h) => setModel(h.model))
       .catch(() => setModel(null));
@@ -53,6 +56,19 @@ export default function App() {
       />
 
       <Container maxWidth="xl" sx={{ py: 4 }}>
+        {STATIC_DEMO && a.status === "static" && (
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <strong>Static demo.</strong> GitHub Pages serves files only, so the Python
+            engine is not running here — these are real results from it, computed at
+            build time and bundled. Uploading your own data and live Claude narratives
+            need the API;{" "}
+            <a href={`${REPO_URL}#running-locally`} target="_blank" rel="noreferrer">
+              run it locally
+            </a>{" "}
+            for those.
+          </Alert>
+        )}
+
         {a.status === "offline" && (
           <Alert severity="info" sx={{ mb: 3 }} onClose={a.reset}>
             Showing a precomputed analysis — the API did not respond
@@ -137,7 +153,9 @@ export default function App() {
                 </CardContent>
               </Card>
 
-              <UploadZone onSubmit={a.runCustom} disabled={a.isLoading} />
+              {!STATIC_DEMO && (
+                <UploadZone onSubmit={a.runCustom} disabled={a.isLoading} />
+              )}
             </Stack>
           </Grid>
 

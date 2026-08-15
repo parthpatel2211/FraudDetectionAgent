@@ -8,6 +8,8 @@ import {
   Typography,
 } from "@mui/material";
 
+import { STATIC_DEMO } from "../config";
+
 /**
  * Shows which engine produced the text. Being visibly honest about the
  * template fallback is a maturity signal, not a weakness - a reviewer who
@@ -104,11 +106,14 @@ export default function NarrativePanel({ summary, loading, onGenerate, model }) 
         </Stack>
       </Box>
 
-      <Box>
-        <Button size="small" onClick={onGenerate}>
-          Regenerate
-        </Button>
-      </Box>
+      {/* No API on a static host, so a Regenerate button would do nothing. */}
+      {!STATIC_DEMO && (
+        <Box>
+          <Button size="small" onClick={onGenerate}>
+            Regenerate
+          </Button>
+        </Box>
+      )}
     </Stack>
   );
 }
